@@ -47,6 +47,7 @@ def load_dataset(batch_size = 32, train=True):
 def plot_image(image):
     image = image.reshape(-1,109,89,3)
     plt.imshow(image[0])
+    plt.show()
     return
 
 
