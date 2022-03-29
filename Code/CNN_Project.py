@@ -24,9 +24,9 @@ def load_dataset(batch_size = 32, train=True):
     feature_set = []
     counter = 0
     # TODO Add file size changes
-    for file in tqdm(os.listdir('C:/Users/bhaga/Documents/GitHub/cs389_final_project/thecarconnectionpicturedataset')):
-        img = Image.open('C:/Users/bhaga/Documents/GitHub/cs389_final_project/thecarconnectionpicturedataset/'+file).resize((89,109)) # Opens the Image
-        img = np.asarray(img).reshape(3,109,89)
+    for file in tqdm(os.listdir('thecarconnectionpicturedataset')):
+        img = Image.open('thecarconnectionpicturedataset/'+file) # Opens the Image
+        # img = np.asarray(img).reshape(3,109,89)
         img_features = file.split("_") # Gets the features from the file name
         feature_set.append(img_features)
 
@@ -45,7 +45,7 @@ def load_dataset(batch_size = 32, train=True):
     return np.array(dataset)
 
 def plot_image(image):
-    image = image.reshape(-1,109,89,3)
+    # image = image.reshape(-1,109,89,3)
     plt.imshow(image[0])
     plt.show()
     return
