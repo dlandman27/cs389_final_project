@@ -93,3 +93,5 @@ dataset = load_dataset(crop_width, crop_height, batch_size=32, train=True)
 ex_image = dataset[random.randint(0, 10)]
 print("image shape:", ex_image.shape)
 plot_image(ex_image,crop_width=crop_width,crop_height=crop_height)
+
+
