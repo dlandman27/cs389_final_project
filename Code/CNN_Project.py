@@ -17,7 +17,7 @@ from tqdm import tqdm
 from PIL import Image #not sure if this one is necessary
 
 # Loads the dataset from the file location
-def load_dataset(batch_size = 32, train=True):
+def load_dataset(crop_width, crop_height, batch_size = 32, train=True):
     dataset = []
     batch_counter = 0
     batch = []
@@ -26,7 +26,19 @@ def load_dataset(batch_size = 32, train=True):
     # TODO Add file size changes
     for file in tqdm(os.listdir('thecarconnectionpicturedataset')):
         img = Image.open('thecarconnectionpicturedataset/'+file) # Opens the Image
-        # img = np.asarray(img).reshape(3,109,89)
+
+        # Crops the image to size new_width x new_height
+        width = img.size[0]
+        height = img.size[1]
+        left = (width - crop_width)/2
+        top = (height - crop_height)/2
+        right = left+crop_width
+        bottom = top+crop_height
+
+        # Cropped image of above dimension
+        # (It will not change original image)
+        img = img.crop((left, top, right, bottom))
+        img = np.asarray(img)
         img_features = file.split("_") # Gets the features from the file name
         feature_set.append(img_features)
 
@@ -44,14 +56,17 @@ def load_dataset(batch_size = 32, train=True):
 
     return np.array(dataset)
 
-def plot_image(image):
-    # image = image.reshape(-1,109,89,3)
+def plot_image(image, crop_width, crop_height):
+    image = image.reshape(-1,crop_width,crop_height,3)
     plt.imshow(image[0])
     plt.show()
     return
 
 
-dataset = load_dataset(batch_size=32,train=True)
-ex_image = dataset[0]
+crop_width = 200 # Width of the cropped image
+crop_height = 200 # Height of the cropped image
+
+dataset = load_dataset(crop_width,crop_height,batch_size=32,train=True)
+ex_image = dataset[random.randint(0,10)]
 print("image shape:", ex_image.shape)
-plot_image(ex_image)
+plot_image(ex_image,crop_width=crop_width,crop_height=crop_height)
