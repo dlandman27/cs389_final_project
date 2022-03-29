@@ -24,8 +24,10 @@ def load_dataset(crop_width, crop_height, batch_size = 32, train=True):
     feature_set = []
     counter = 0
     # TODO Add file size changes
-    for file in tqdm(os.listdir('thecarconnectionpicturedataset')):
-        img = Image.open('thecarconnectionpicturedataset/'+file) # Opens the Image
+    directory = os.path.realpath(os.path.join(os.path.dirname(__file__), "..", "thecarconnectionpicturedataset"))
+    for file in tqdm(os.listdir(directory)):
+        filepath = os.path.join(directory,file)
+        img = Image.open(filepath) # Opens the Image
 
         # Crops the image to size new_width x new_height
         width = img.size[0]
