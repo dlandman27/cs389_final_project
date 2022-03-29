@@ -77,7 +77,7 @@ def load_dataset(crop_width, crop_height, batch_size = 32, train=True):
 
 
 def plot_image(image, crop_width, crop_height):
-    image = image.reshape(-1,crop_width,crop_height,3)
+    image = image.reshape(-1,crop_height,crop_width,3)
     plt.imshow(image[0])
     plt.show()
     return
@@ -86,8 +86,8 @@ def plot_image(image, crop_width, crop_height):
 #print(Find_Average_Image_Dimension())
 
 
-crop_width = 320  # Average Width of the cropped image is 320
-crop_height = 300  # Average Height of the cropped image is 230
+crop_width = 300  # Average Width of the cropped image is 320
+crop_height = 320  # Average Height of the cropped image is 230
 dataset = load_dataset(crop_width, crop_height, batch_size=32, train=True)
 
 ex_image = dataset[random.randint(0, 10)]
