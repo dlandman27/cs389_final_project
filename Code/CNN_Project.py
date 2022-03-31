@@ -33,7 +33,7 @@ def Find_Average_Image_Dimension():
 
 
 # Loads the dataset from the file location
-def load_dataset(preLoad, crop_width, crop_height, batch_size = 32, train=True):
+def load_dataset( crop_width, crop_height, batch_size = 32, train=True):
     dataset = []
     batch_counter = 0
     batch = []
@@ -89,7 +89,7 @@ def plot_image(image, crop_width, crop_height):
 
 crop_width = 300  # Average Width of the cropped image is 320
 crop_height = 210  # Average Height of the cropped image is 230
-dataset = load_dataset(False ,crop_width, crop_height, batch_size=32, train=True)
+dataset = load_dataset(crop_width, crop_height, batch_size=32, train=True)
 
 ex_image = dataset[random.randint(0, 10)]
 print("image shape:", ex_image.shape)
