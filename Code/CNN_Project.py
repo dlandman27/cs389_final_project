@@ -31,8 +31,9 @@ def Find_Average_Image_Dimension():
     height = height/ number_Of_Images
     return (width,height)
 
+
 # Loads the dataset from the file location
-def load_dataset(crop_width, crop_height, batch_size = 32, train=True):
+def load_dataset( crop_width, crop_height, batch_size = 32, train=True):
     dataset = []
     batch_counter = 0
     batch = []
