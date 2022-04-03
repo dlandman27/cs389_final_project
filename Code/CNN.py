@@ -10,9 +10,12 @@ class CNN(nn.Module):
         #Stride: 1
         #Kernel Size: 5x5 
         
-        self.conv1 = nn.Conv2d(3, 64, 5)
-        self.conv2 = nn.Conv2d(64, 128, 5)
-        
+        self.conv1 = nn.Conv2d(3, 64, 7) #(64, (304,206)
+        self.pool1 = F.max_pool2d((2, 2), stride=(2, 2)) #(64, (152,103))
+        self.conv2 = nn.Conv2d(64, 128, 5) # (128, (148,99))
+        self.pool2 = F.max_pool2d((2,2), stride=(2, 2), padding = (0,1)) #(128, (75,
+
+
         self.fc1 = nn.Linear(3*7*128, 1024) 
         self.fc2 = nn.Linear(1024, 2)
 

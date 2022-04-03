@@ -120,7 +120,7 @@ dataset = load_dataset(crop_width, crop_height, batch_size=32, train=True)[0]
 #Option1: 
 #Also variable methods when working with GPU, would look into that
 model = CNN()
-print(model)
+
 
 optimizer = torch.optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
 # direct = os.path.realpath(os.path.join(os.path.dirname("ModelState.pt"), "..", "SavedStates"))
