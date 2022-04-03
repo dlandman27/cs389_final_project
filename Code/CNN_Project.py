@@ -16,22 +16,7 @@ import random
 from tqdm import tqdm
 from PIL import Image #not sure if this one is necessary
 from CNN import CNN
-
-
-def Find_Average_Image_Dimension():
-    width = 0
-    height = 0
-    number_Of_Images = 0
-    directory = os.path.realpath(os.path.join(os.path.dirname(__file__), "..", "thecarconnectionpicturedataset"))
-    for file in tqdm(os.listdir(directory)):
-        filepath = os.path.join(directory,file)
-        img = Image.open(filepath) # Opens the Image
-        number_Of_Images +=1
-        width += img.size[0]
-        height += img.size[1]
-    width = width/number_Of_Images
-    height = height/ number_Of_Images
-    return (width,height)
+from sklearn.model_selection import train_test_split
 
 
 def Find_Average_Image_Dimension():
@@ -55,50 +40,65 @@ def Find_Average_Image_Dimension():
 
 def load_dataset( crop_width, crop_height, batch_size = 32, train=True):
 
+    training_set_final = []
+    test_set_final = []
+    training_feature_set = []
+    test_feature_set = []
     dataset = []
-    batch_counter = 0
-    batch = []
-    feature_set = []
-    counter = 0
-    # TODO Add file size changes
+
     directory = os.path.realpath(os.path.join(os.path.dirname(__file__), "..", "thecarconnectionpicturedataset"))
     for file in tqdm(os.listdir(directory)):
-        filepath = os.path.join(directory,file)
-        img = Image.open(filepath) # Opens the Image
+        filepath = os.path.join(directory, file)
+        dataset.append(filepath)
 
-        # Crops the image to size new_width x new_height
-        width = img.size[0]
-        height = img.size[1]
-        left = (width - crop_width)/2
-        top = (height - crop_height)/2
-        right = left+crop_width
-        bottom = top+crop_height
+    training_Set, test_set = train_test_split(dataset, test_size=0.3, random_state=25)
 
-        # Cropped image of above dimension
-        # (It will not change original image)
-        img = img.crop((left, top, right, bottom))
-        img = np.asarray(img)
+    def process_Image_Set(data, final_set, final_feature):
+        counter = 0
+        batch_counter = 0
+        batch = []
+        feature_batch = []
+        for image in dataset:
+            img = Image.open(image)
 
-        img_features = file.split("_") # Gets the features from the file name
-        feature_set.append(img_features)
+            # Crops the image to size new_width x new_height
+            width = img.size[0]
+            height = img.size[1]
+            left = (width - crop_width) / 2
+            top = (height - crop_height) / 2
+            right = left + crop_width
+            bottom = top + crop_height
 
-        if(counter > 1000):
-            break
-        else:
-            counter+=1
-        if batch_counter < batch_size:
-            batch.append(img)
-            batch_counter = batch_counter + 1
-        else:
-            dataset.append(np.array(batch))
-            batch = []
-            batch_counter = 0
+            # Cropped image of above dimension
+            # (It will not change original image)
+            img = img.crop((left, top, right, bottom))
+            img = np.asarray(img)
 
-    return np.array(dataset)
+            img_features = np.array(file.split("_"))  # Gets the features from the file name
+
+            if counter > 1000:
+                break
+            else:
+                counter += 1
+            if batch_counter < batch_size:
+                batch.append(img)
+                feature_batch.append(img_features)
+                batch_counter = batch_counter + 1
+            else:
+                final_set.append(np.array(batch))
+                final_feature.append(np.array(feature_batch))
+                batch = []
+                feature_batch = []
+                batch_counter = 0
+        # if len(batch) > 0:
+        #     final_set.append(batch)
+        #     final_feature.append(feature_batch)
+
+    process_Image_Set(training_Set, training_set_final, training_feature_set)
+    process_Image_Set(test_set, test_set_final, test_feature_set)
 
 
-
-
+    return (np.array(training_set_final), np.array(test_set_final))
 
 
 def plot_image(image, crop_width, crop_height):
@@ -114,12 +114,14 @@ def plot_image(image, crop_width, crop_height):
 
 crop_width = 300  # Average Width of the cropped image is 320
 crop_height = 210  # Average Height of the cropped image is 230
-dataset = load_dataset(crop_width, crop_height, batch_size=32, train=True)
+dataset = load_dataset(crop_width, crop_height, batch_size=32, train=True)[0]
 
 
 #Option1: 
 #Also variable methods when working with GPU, would look into that
 model = CNN()
+print(model)
+
 optimizer = torch.optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
 # direct = os.path.realpath(os.path.join(os.path.dirname("ModelState.pt"), "..", "SavedStates"))
 #save model
@@ -150,9 +152,7 @@ model.eval()
 # model.train()
 
 
-crop_width = 300  # Average Width of the cropped image is 320
-crop_height = 210  # Average Height of the cropped image is 230
-dataset = load_dataset(crop_width, crop_height, batch_size=32, train=True)
+
 
 
 ex_image = dataset[random.randint(0, 10)]
