@@ -90,13 +90,10 @@ def load_dataset( crop_width, crop_height, batch_size = 32, train=True):
                 batch = []
                 feature_batch = []
                 batch_counter = 0
-        # if len(batch) > 0:
-        #     final_set.append(batch)
-        #     final_feature.append(feature_batch)
 
     process_Image_Set(training_Set, training_set_final, training_feature_set)
     process_Image_Set(test_set, test_set_final, test_feature_set)
-    return (np.array(training_set_final), np.array(test_set_final))
+    return (np.array(training_set_final), np.array(test_set_final), np.array(training_feature_set), np.array(test_feature_set))
 
 
 def plot_image(image, crop_width, crop_height):
@@ -105,31 +102,99 @@ def plot_image(image, crop_width, crop_height):
     plt.show()
     return
 
-
-#Since I found the average image size there is no need to run this function anymore
-#print(Find_Average_Image_Dimension())
-
-
+# Hyperparamters and Stuff
+loadModel = False
+saveModel = True
+batch = 32
+n_epochs = 1
+learning_rate = .00001
+update_interval = 100
+loss_function = nn.CrossEntropyLoss()
 crop_width = 300  # Average Width of the cropped image is 320
 crop_height = 210  # Average Height of the cropped image is 230
-dataset = load_dataset(crop_width, crop_height, batch_size=32, train=True)[0]
-ex_image = dataset[random.randint(0, 10)]
-print(ex_image.shape)
-print("image shape:", ex_image.shape)
-plot_image(ex_image,crop_width=crop_width,crop_height=crop_height)
-
-#Option1: 
-#Also variable methods when working with GPU, would look into that
+dataset, test_set, dataset_features, test_features = load_dataset(crop_width, crop_height, batch_size=batch, train=True)
 model = CNN()
-model.forward(ex_image)
+model = model.load_state_dict(torch.load("../SavedStates/ModelState.pt")) if loadModel else model  # loads a model if you want
+optimizer = torch.optim.Adam(model.parameters(), lr= learning_rate)
+ex_image = dataset[random.randint(0, 10)]  # prints an random image from the dataset and plots it
+plot_image(ex_image, crop_width=crop_width, crop_height=crop_height)
 
-optimizer = torch.optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
+
+
+
+def training(model, dataset, featureSet, loss_function, optimizer, n_epochs, update_interval):
+    losses = []
+    count = 0
+    for n in range(n_epochs):
+        for i in enumerate(tqdm(dataset)):
+
+            optimizer.zero_grad()
+            print(i.shape)
+            my_output = model(i)
+            # print(torch.from_numpy(featureSet[count]).float().shape)
+            loss = loss_function(my_output, torch.from_numpy(featureSet[count]).float())
+            loss.backward()
+            optimizer.step()
+            count = count + 1
+
+            if i % update_interval == 0:
+                losses.append(round(loss.item(), 2))
+
+    return model, losses
+
+
+r = training(model, dataset, dataset_features, loss_function, optimizer, n_epochs, update_interval)
+
+
+#Option1:
+#Also variable methods when working with GPU, would look into that
+
+
+
 # direct = os.path.realpath(os.path.join(os.path.dirname("ModelState.pt"), "..", "SavedStates"))
 #save model
 torch.save(model.state_dict(), "../SavedStates/ModelState.pt")
 #load entire model
-model.load_state_dict(torch.load("../SavedStates/ModelState.pt"))
-model.eval()
+
+#model.eval()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #Option2: 
 #Saving & Loading a General Checkpoint for Inference and/or Resuming Training

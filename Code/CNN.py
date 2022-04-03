@@ -48,7 +48,6 @@ class CNN(nn.Module):
         x = self.pool3(x)
         x = self.relu(x)
         x = self.flat(x)
-        print(x.shape)
         x = self.fc1(x)
         x = self.relu(x)
         x = self.fc2(x)
