@@ -14,7 +14,7 @@ from matplotlib.image import imread
 import os
 import random
 from tqdm import tqdm
-from PIL import Image #not sure if this one is necessary
+from PIL import Image
 from CNN import CNN
 from sklearn.model_selection import train_test_split
 
@@ -72,7 +72,7 @@ def load_dataset( crop_width, crop_height, batch_size = 32, train=True):
             # Cropped image of above dimension
             # (It will not change original image)
             img = img.crop((left, top, right, bottom))
-            img = np.asarray(img)
+            img = np.asarray(img).reshape(3, 300, 210)
 
             img_features = np.array(file.split("_"))  # Gets the features from the file name
 
@@ -96,8 +96,6 @@ def load_dataset( crop_width, crop_height, batch_size = 32, train=True):
 
     process_Image_Set(training_Set, training_set_final, training_feature_set)
     process_Image_Set(test_set, test_set_final, test_feature_set)
-
-
     return (np.array(training_set_final), np.array(test_set_final))
 
 
@@ -115,12 +113,15 @@ def plot_image(image, crop_width, crop_height):
 crop_width = 300  # Average Width of the cropped image is 320
 crop_height = 210  # Average Height of the cropped image is 230
 dataset = load_dataset(crop_width, crop_height, batch_size=32, train=True)[0]
-
+ex_image = dataset[random.randint(0, 10)]
+print(ex_image.shape)
+print("image shape:", ex_image.shape)
+plot_image(ex_image,crop_width=crop_width,crop_height=crop_height)
 
 #Option1: 
 #Also variable methods when working with GPU, would look into that
 model = CNN()
-
+model.forward(ex_image)
 
 optimizer = torch.optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
 # direct = os.path.realpath(os.path.join(os.path.dirname("ModelState.pt"), "..", "SavedStates"))
@@ -150,35 +151,3 @@ model.eval()
 # model.eval()
 # # - or -
 # model.train()
-
-
-
-
-
-ex_image = dataset[random.randint(0, 10)]
-print("image shape:", ex_image.shape)
-plot_image(ex_image,crop_width=crop_width,crop_height=crop_height)
-
-
-####################################################
-#Create model
-
-
-#training loop
-
-
-#save model states
-
-
-
-#test on test set
-
-
-
-#Create graph(s)
-
-#Done for the first milestone
-
-
-#################################################
-
