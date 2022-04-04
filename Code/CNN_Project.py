@@ -114,13 +114,14 @@ saveModel = True
 batch = 32
 n_epochs = 1
 learning_rate = .00001
-update_interval = 100
+update_interval = 1
 loss_function = nn.CrossEntropyLoss()
 crop_width = 300  # Average Width of the cropped image is 320
 crop_height = 210  # Average Height of the cropped image is 230
 dataset, test_set, dataset_features, test_features = load_dataset(crop_width, crop_height, batch_size=batch, train=True)
 model = CNN()
-model = model.load_state_dict(torch.load("../SavedStates/ModelState.pt")) if loadModel else model  # loads a model if you want
+directory = os.path.realpath(os.path.join(os.path.dirname(__file__), "..", "thecarconnectionpicturedataset"))
+model = model.load_state_dict(torch.load(directory)) if loadModel else model  # loads a model if you want
 optimizer = torch.optim.Adam(model.parameters(), lr= learning_rate)
 ex_image = dataset[random.randint(0, 10)]  # prints an random image from the dataset and plots it
 plot_image(ex_image, crop_width=crop_width, crop_height=crop_height)
@@ -150,24 +151,23 @@ def training(model, dataset, featureSet, loss_function, optimizer, n_epochs, upd
 
 
 
-
 #Option1:
 #Also variable methods when working with GPU, would look into that
-
-
 if  not loadModel:
-    r = training(model, dataset, dataset_features, loss_function, optimizer, n_epochs, update_interval)
+    model, losses = training(model, dataset, dataset_features, loss_function, optimizer, n_epochs, update_interval)
 # direct = os.path.realpath(os.path.join(os.path.dirname("ModelState.pt"), "..", "SavedStates"))
 #save model
 if saveModel:
     direct = os.path.realpath(os.path.join(os.path.dirname("ModelState.pt"), "..", "SavedStates"))
-    torch.save(r[0].state_dict(), direct)
+    torch.save(model.state_dict(), direct)
 
 
-#load entire model
-
-#model.eval()
-
+plt.plot(np.arange(len(losses)) * batch * update_interval, losses)
+plt.title("training curve")
+plt.xlabel("number of images trained on")
+plt.ylabel("Reconstruction loss")
+plt.show()
+directory = os.path.realpath(os.path.join(os.path.dirname(__file__), "..", "graphs"))
 
 
 
