@@ -51,17 +51,6 @@ class CNN(nn.Module):
         x = self.fc1(x)
         x = self.relu(x)
         x = self.fc2(x)
-        x = self.relu(x)
-
-        # x = F.max_pool2d(F.relu(self.conv1(x)), (2, 2))
-        # x = F.max_pool2d(F.relu(self.conv2(x)), (2, 2))
-        #
-        # x = x.view(x.size(0), -1)
-        # x = F.relu(self.fc1(x))
-        # x = F.dropout(x, 0.5)
-        # x = F.relu(self.fc2(x))
-        #
-        # print(x.shape())
 
         return x
 

@@ -50,8 +50,7 @@ def load_dataset( crop_width, crop_height, batch_size = 32, train=True):
 
     directory = os.path.realpath(os.path.join(os.path.dirname(__file__), "..", "thecarconnectionpicturedataset"))
     for file in tqdm(os.listdir(directory)):
-        filepath = os.path.join(directory, file)
-        dataset.append(filepath)
+        dataset.append(file)
 
     # Splits the dataset into training and test sets
     training_Set, test_set = train_test_split(dataset, test_size=0.3, random_state=25)
@@ -62,8 +61,8 @@ def load_dataset( crop_width, crop_height, batch_size = 32, train=True):
         batch_counter = 0
         batch = []
         feature_batch = []
-        for image in dataset:
-            img = Image.open(image)
+        for image in data:
+            img = Image.open(os.path.join(directory, image))
 
             # Crops the image to size new_width x new_height
             width = img.size[0]
@@ -78,7 +77,9 @@ def load_dataset( crop_width, crop_height, batch_size = 32, train=True):
             img = img.crop((left, top, right, bottom))
             img = np.asarray(img).reshape(3, 300, 210)
 
-            img_features = np.array(file.split("_"))  # Gets the features from the file name
+            img_features = np.array(image.split("_"))  # Gets the features from the file name
+            if img_features[3] == "nan":
+                continue
             price = [int(img_features[3])] # Gets the price from the file name
 
             # TODO DELETE THIS
@@ -114,15 +115,15 @@ saveModel = True
 batch = 32
 n_epochs = 1
 learning_rate = .00001
-update_interval = 1
-loss_function = nn.CrossEntropyLoss()
+update_interval = 10
+loss_function = nn.MSELoss()
 crop_width = 300  # Average Width of the cropped image is 320
 crop_height = 210  # Average Height of the cropped image is 230
 dataset, test_set, dataset_features, test_features = load_dataset(crop_width, crop_height, batch_size=batch, train=True)
 model = CNN()
-directory = os.path.realpath(os.path.join(os.path.dirname(__file__), "..", "thecarconnectionpicturedataset"))
+directory = os.path.realpath(os.path.join(os.path.dirname(__file__), "..", "SavedStates", "ModelState.pt"))
 model = model.load_state_dict(torch.load(directory)) if loadModel else model  # loads a model if you want
-optimizer = torch.optim.Adam(model.parameters(), lr= learning_rate)
+optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 ex_image = dataset[random.randint(0, 10)]  # prints an random image from the dataset and plots it
 plot_image(ex_image, crop_width=crop_width, crop_height=crop_height)
 
@@ -132,12 +133,9 @@ def training(model, dataset, featureSet, loss_function, optimizer, n_epochs, upd
     for n in range(n_epochs):
         iterator = 0
         count = 0
-        for i in (tqdm(dataset)):
+        for i in tqdm(dataset):
             optimizer.zero_grad()
-            
             my_output = model(i)
-
-            # print(torch.from_numpy(featureSet[count]).float().shape)
             loss = loss_function(my_output, torch.from_numpy(featureSet[count]).float())
             loss.backward()
             optimizer.step()
@@ -151,23 +149,24 @@ def training(model, dataset, featureSet, loss_function, optimizer, n_epochs, upd
 
 
 
-#Option1:
-#Also variable methods when working with GPU, would look into that
-if  not loadModel:
+
+if not loadModel:
     model, losses = training(model, dataset, dataset_features, loss_function, optimizer, n_epochs, update_interval)
-# direct = os.path.realpath(os.path.join(os.path.dirname("ModelState.pt"), "..", "SavedStates"))
+    plt.plot(np.arange(len(losses)) * batch * update_interval, losses)
+    plt.title("training curve")
+    plt.xlabel("number of images trained on")
+    plt.ylabel("Reconstruction loss")
+    plt.show()
+    directory = os.path.realpath(os.path.join(os.path.dirname(__file__), "..", "graphs", "training"))
+    plt.savefig(directory)
+
 #save model
 if saveModel:
-    direct = os.path.realpath(os.path.join(os.path.dirname("ModelState.pt"), "..", "SavedStates"))
+    direct = os.path.realpath(os.path.join(os.path.dirname("ModelState.pt"), "..", "SavedStates", "ModelState.pt"))
     torch.save(model.state_dict(), direct)
 
 
-plt.plot(np.arange(len(losses)) * batch * update_interval, losses)
-plt.title("training curve")
-plt.xlabel("number of images trained on")
-plt.ylabel("Reconstruction loss")
-plt.show()
-directory = os.path.realpath(os.path.join(os.path.dirname(__file__), "..", "graphs"))
+
 
 
 
