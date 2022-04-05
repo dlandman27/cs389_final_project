@@ -148,17 +148,52 @@ def training(model, dataset, featureSet, loss_function, optimizer, n_epochs, upd
     return model, losses
 
 
+def testing(model, loss_function, test_data, test_label):
+    sum_loss = 0
+    n_correct = 0
+    total = 0
+    counter = 0
+    for i in tqdm(test_data):
+        # This is essentially exactly the same as the training loop
+        # without the, well, training, part
+        tensor_label = torch.from_numpy(test_label[counter]).float()
+        pred = model(i)
+        loss = loss_function(pred, tensor_label)
+        sum_loss += loss.item()
+
+        _, predicted = torch.max(pred, 1)
+        n_correct += (predicted == tensor_label).sum()
+        total += tensor_label.size(0)
+        counter += 1
+
+    test_acc = round(((n_correct / total).item() * 100), 2)
+    avg_loss = round(sum_loss / len(test_data), 2)
+
+    print("test accuracy:", test_acc)
+    print("test loss:", avg_loss)
+
+    return test_acc, avg_loss
 
 
-if not loadModel:
-    model, losses = training(model, dataset, dataset_features, loss_function, optimizer, n_epochs, update_interval)
-    plt.plot(np.arange(len(losses)) * batch * update_interval, losses)
+def train_and_test(model, batch_size, dataset, dataset_features, test_set, test_features, loss_function, optimizer, n_epochs, update_interval):
+    trained_model, losses = training(model, dataset, dataset_features, loss_function, optimizer, n_epochs, update_interval)
+
+    test_acc, test_loss = testing(trained_model, loss_function, test_set, test_features)
+
+    plt.plot(np.arange(len(losses)) * batch_size * update_interval, losses, label="training loss")
+    plt.hlines(test_loss, 0, len(losses) * batch_size * update_interval, color='r', label="test loss")
     plt.title("training curve")
     plt.xlabel("number of images trained on")
     plt.ylabel("Reconstruction loss")
+    path = os.path.realpath(os.path.join(os.path.dirname(__file__), "..", "graphs", "training.png"))
+    plt.savefig(path)
     plt.show()
-    directory = os.path.realpath(os.path.join(os.path.dirname(__file__), "..", "graphs", "training"))
-    plt.savefig(directory)
+
+    return trained_model, test_loss
+
+
+if not loadModel:
+    model, test_loss = train_and_test(model, batch, dataset, dataset_features, test_set, test_features, loss_function, optimizer, n_epochs, update_interval)
 
 #save model
 if saveModel:
