@@ -83,7 +83,7 @@ def load_dataset( crop_width, crop_height, batch_size = 32, train=True):
             price = [int(img_features[3])] # Gets the price from the file name
 
             # TODO DELETE THIS
-            if counter > 1000:
+            if counter > 2000:
                 break
             else:
                 counter += 1
@@ -185,7 +185,7 @@ def train_and_test(model, batch_size, dataset, dataset_features, test_set, test_
     plt.title("training curve")
     plt.xlabel("number of images trained on")
     plt.ylabel("Reconstruction loss")
-    path = os.path.realpath(os.path.join(os.path.dirname(__file__), "..", "graphs", "training.png"))
+    path = os.path.realpath(os.path.join(os.path.dirname(__file__), "..", "graphs", "training2.png"))
     plt.savefig(path)
     plt.show()
 
