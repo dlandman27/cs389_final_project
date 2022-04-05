@@ -34,16 +34,17 @@ crop_height = 210  # Average Height of the cropped image is 230
 optimizer = torch.optim.Adam
 model = CNN()
 
+# Defines the Dataset and the Network
 data = dataset(filepath="thecarconnectionpicturedataset",crop_width=crop_width,crop_height=crop_height,batch=batch,train=True)
 neural_network = network(data,loadModel,saveModel,batch,n_epochs,learning_rate,update_interval,loss_function,model,optimizer)
 
 # data.plotRandomImage()
 
+# Checks if we are loading a model or training a new one
 if(loadModel):
     neural_network.load_model()
 else:
-    neural_network.train_model()
-
+    losses = neural_network.train_and_test()
 
 #model.eval()
 

@@ -41,6 +41,7 @@ class network():
         direct = os.path.realpath(os.path.join(os.path.dirname("ModelState.pt"), "..", "SavedStates"))
         torch.save(r[0].state_dict(), direct)
 
+    # Trains the Model
     def train_model(self):
         losses = []
         for n in range(self.n_epochs):
@@ -58,15 +59,17 @@ class network():
                     losses.append(round(loss.item(), 2))
                 iterator+=1
 
-        if(self.saveModel):
-            self.save_model(losses)
+        # if(self.saveModel):
+            # self.save_model(self.model)
 
-        return losses
+        return self.model, losses
 
+    # Tests the Model
+    def test_model(self):
 
-    def test_model(self, test_data, test_label):
-        test_data = self.data.getDatasetFeatures()
-        test_label = self.data.getDatasetLabels()
+        # TODO CHANGE = FOR TESTDATA AND TEST LABEL
+        test_data = self.data.getTestSet()
+        test_label = self.data.getTestFeatures()
         sum_loss = 0
         n_correct = 0
         total = 0
@@ -93,11 +96,16 @@ class network():
 
         return test_acc, avg_loss
 
-
+    # Trains and tests the model
     def train_and_test(self):
         trained_model, losses = self.train_model()
 
-        test_acc, test_loss = self.test_model(trained_model, test_set, test_features)
+        test_set = self.data.getTestSet()
+        test_features = self.data.getTestFeatures()
+
+        test_acc, test_loss = self.test_model()
+
+        # test_acc, test_loss = self.test_model(trained_model, test_set, test_features)
 
         plt.plot(np.arange(len(losses)) * self.batch * self.update_interval, losses, label="training loss")
         plt.hlines(test_loss, 0, len(losses) * self.batch * self.update_interval, color='r', label="test loss")
@@ -105,7 +113,7 @@ class network():
         plt.xlabel("number of images trained on")
         plt.ylabel("Reconstruction loss")
         path = os.path.realpath(os.path.join(os.path.dirname(__file__), "..", "graphs", "training2.png"))
-        plt.savefig(path)
+        # plt.savefig(path)
         plt.show()
 
         return trained_model, test_loss
