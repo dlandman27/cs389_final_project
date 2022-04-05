@@ -10,7 +10,7 @@
 
 ## Review 3:
 ### Link: https://paperswithcode.com/paper/price-aware-recommendation-with-graph
-
+ Summary: Recommendation systems are extremely important when it comes to targeted marketing of customers. And an important factor if a recommendation will be bought by a potential buyer will largely depend on the price of the item at hand. However, the author suggests a term, WTP, where it makes sense for the user to be willing to pay (WTP) a price for the item at interest. Purchase history of a user and the variable tolerances of price in different topics play are two examples the author identifies to understand the boundaries of WTP. Giving larger weightage to price points, the author proposes a solution that implements Graph Convolution Networks, and the factors of items and prices take place. This helps analyze the user's category-dependent price awareness. We felt this was largely relevant to our project due to it's emphasis on price optimization and thought that their unique solution of PUP Graph Convolutional Networks would be applicable as well. 
 
 # Data Set: 
 ## Link: https://www.kaggle.com/datasets/doaaalsenani/usa-cers-dataset
