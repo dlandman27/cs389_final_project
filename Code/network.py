@@ -48,10 +48,7 @@ class network():
             count = 0
             for i in (tqdm(self.data.getDataset())):
                 self.optimizer.zero_grad()
-                
                 my_output = self.model(i)
-
-                # print(torch.from_numpy(featureSet[count]).float().shape)
                 loss = self.loss_function(my_output, torch.from_numpy(self.data.getDatasetFeatures()[count]).float())
                 loss.backward()
                 self.optimizer.step()
@@ -65,3 +62,50 @@ class network():
             self.save_model(losses)
 
         return losses
+
+
+    def test_model(self, test_data, test_label):
+        test_data = self.data.getDatasetFeatures()
+        test_label = self.data.getDatasetLabels()
+        sum_loss = 0
+        n_correct = 0
+        total = 0
+        counter = 0
+
+        for i in tqdm(test_data):
+            # This is exactly the same as the training loop
+            # without the, well, training, part
+            tensor_label = torch.from_numpy(test_label[counter]).float()
+            pred = self.model(i)
+            loss = self.loss_function(pred, tensor_label)
+            sum_loss += loss.item()
+
+            _, predicted = torch.max(pred, 1)
+            n_correct += (predicted == tensor_label).sum()
+            total += tensor_label.size(0)
+            counter += 1
+
+        test_acc = round(((n_correct / total).item() * 100), 2)
+        avg_loss = round(sum_loss / len(test_data), 2)
+
+        print("test accuracy:", test_acc)
+        print("test loss:", avg_loss)
+
+        return test_acc, avg_loss
+
+
+    def train_and_test(self):
+        trained_model, losses = self.train_model()
+
+        test_acc, test_loss = self.test_model(trained_model, test_set, test_features)
+
+        plt.plot(np.arange(len(losses)) * self.batch * self.update_interval, losses, label="training loss")
+        plt.hlines(test_loss, 0, len(losses) * self.batch * self.update_interval, color='r', label="test loss")
+        plt.title("training curve")
+        plt.xlabel("number of images trained on")
+        plt.ylabel("Reconstruction loss")
+        path = os.path.realpath(os.path.join(os.path.dirname(__file__), "..", "graphs", "training2.png"))
+        plt.savefig(path)
+        plt.show()
+
+        return trained_model, test_loss
