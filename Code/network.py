@@ -146,7 +146,7 @@ class network():
         plt.title("training curve")
         plt.xlabel("number of images trained on")
         plt.ylabel("Reconstruction loss")
-        path = os.path.realpath(os.path.join(os.path.dirname(__file__), "..", "graphs", "training2.png"))
+        path = os.path.realpath(os.path.join(os.path.dirname(__file__), "..", "graphs", "training.png"))
         # plt.savefig(path)
         plt.show()
 

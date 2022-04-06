@@ -66,8 +66,7 @@ class dataset():
 
         directory = os.path.realpath(os.path.join(os.path.dirname(__file__), "..", "thecarconnectionpicturedataset"))
         for file in tqdm(os.listdir(directory)):
-            filepath = os.path.join(directory, file)
-            dataset.append(filepath)
+            dataset.append(file)
 
         # Splits the dataset into training and test sets
         training_Set, test_set = train_test_split(dataset, test_size=0.3, random_state=25)
@@ -78,8 +77,8 @@ class dataset():
             batch_counter = 0
             batch = []
             feature_batch = []
-            for image in dataset:
-                img = Image.open(image)
+            for image in data:
+                img = Image.open(os.path.join(directory, image))
 
                 # Crops the image to size new_width x new_height
                 width = img.size[0]
@@ -94,11 +93,13 @@ class dataset():
                 img = img.crop((left, top, right, bottom))
                 img = np.asarray(img).reshape(3, 300, 210)
 
-                img_features = np.array(file.split("_"))  # Gets the features from the file name
+                img_features = np.array(image.split("_"))  # Gets the features from the file name
+                if img_features[3] == "nan":
+                    continue
                 price = [int(img_features[3])] # Gets the price from the file name
 
                 # TODO DELETE THIS
-                if counter > 1000:
+                if counter > 2000:
                     break
                 else:
                     counter += 1
