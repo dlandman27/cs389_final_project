@@ -42,6 +42,11 @@ neural_network = network(data,loadModel,saveModel,batch,n_epochs,learning_rate,u
 neural_network.train_and_test()
 
 
+
+# TODO LOAD AND SAVE MODEL
+
+
+
 # def load_dataset( crop_width, crop_height, batch_size = 32, train=True):
 
 #     training_set_final = [] # This is the final training set
