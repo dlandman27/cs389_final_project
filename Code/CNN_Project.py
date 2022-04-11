@@ -274,7 +274,6 @@ neural_network.train_and_test()
 
 
 
-
 #Option2: 
 #Saving & Loading a General Checkpoint for Inference and/or Resuming Training
 #https://pytorch.org/tutorials/beginner/saving_loading_models.html#saving-loading-a-general-checkpoint-for-inference-and-or-resuming-training 
