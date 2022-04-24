@@ -65,11 +65,12 @@ class network():
         return self.loadModel
             
     def load_model(self):
-        self.model = self.model.load_state_dict(torch.load("../SavedStates/ModelState.pt"))
+        directory = os.path.realpath(os.path.join(os.path.dirname(__file__), "..", "SavedStates", "ModelState.pt"))
+        self.model = torch.load(directory)
 
-    def save_model(self,r):
-        direct = os.path.realpath(os.path.join(os.path.dirname("ModelState.pt"), "..", "SavedStates"))
-        torch.save(r[0].state_dict(), direct)
+    # def save_model(self,r):
+    #     direct = os.path.realpath(os.path.join(os.path.dirname("ModelState.pt"), "SavedStates"))
+    #     torch.save(r[0].state_dict(), direct)
 
     
     def train_model(self):
@@ -127,7 +128,6 @@ class network():
         test_acc = round(((n_correct / total).item() * 100), 2)
         avg_loss = round(sum_loss / len(test_data), 2)
 
-        print("test accuracy:", test_acc)
         print("test loss:", avg_loss)
 
         return test_acc, avg_loss
@@ -147,7 +147,13 @@ class network():
         plt.xlabel("number of images trained on")
         plt.ylabel("Reconstruction loss")
         path = os.path.realpath(os.path.join(os.path.dirname(__file__), "..", "graphs", "training.png"))
-        # plt.savefig(path)
+
+        # Saves the model if saveModel is True
+        directory = os.path.realpath(os.path.join(os.path.dirname(__file__), "..", "SavedStates", "ModelState.pt"))
+        if(self.saveModel):
+            torch.save(trained_model, directory)
+
+        plt.savefig(path)
         plt.show()
 
         return trained_model, test_loss

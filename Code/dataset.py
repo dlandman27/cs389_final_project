@@ -99,7 +99,7 @@ class dataset():
                 price = [int(img_features[3])] # Gets the price from the file name
 
                 # TODO DELETE THIS
-                if counter > 2000:
+                if counter > 1000:
                     break
                 else:
                     counter += 1

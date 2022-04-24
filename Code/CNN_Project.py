@@ -22,8 +22,8 @@ from dataset import dataset
 from network import network
 
 # Hyperparamters
-loadModel = False
-saveModel = True
+loadModel = True
+saveModel = False
 batch = 32
 n_epochs = 1
 learning_rate = .00001
@@ -34,12 +34,15 @@ crop_height = 210  # Average Height of the cropped image is 230
 model = CNN()
 directory = os.path.realpath(os.path.join(os.path.dirname(__file__), "..", "SavedStates", "ModelState.pt"))
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
-
 data = dataset(filepath="thecarconnectionpicturedataset",crop_width=crop_width,crop_height=crop_height,batch=batch,train=True)
 neural_network = network(data,loadModel,saveModel,batch,n_epochs,learning_rate,update_interval,loss_function,model,optimizer)
 
+if(loadModel):
+    neural_network.load_model()
+    neural_network.test_model()
+    print("wheres maanas")
 
-neural_network.train_and_test()
+# neural_network.train_and_test()
 
 
 
